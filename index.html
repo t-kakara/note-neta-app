@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>noteネタ帳</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #f5f9f5 0%, #faf7f0 100%);
+            min-height: 100vh;
+            color: #3d5a3d;
+            padding: 12px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 28px;
+            padding-top: 16px;
+        }
+
+        .leaf-icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+
+        h1 {
+            font-size: 28px;
+            color: #2d4a2d;
+            margin-bottom: 6px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #6b8a6b;
+            font-weight: 300;
+        }
+
+        .theme-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .theme-btn {
+            padding: 10px 18px;
+            border: 2px solid #c8dcc8;
+            background: white;
+            color: #5a7a5a;
+            border-radius: 24px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(61, 90, 61, 0.08);
+        }
+
+        .theme-btn:hover {
+            border-color: #a8d4a8;
+            background: #f9fef9;
+        }
+
+        .theme-btn.active {
+            background: linear-gradient(135deg, #8ec78e 0%, #7ab87a 100%);
+            color: white;
+            border-color: #7ab87a;
+            box-shadow: 0 4px 12px rgba(122, 184, 122, 0.25);
+        }
+
+        .content-area {
+            background: white;
+            border-radius: 16px;
+            padding: 32px 24px;
+            box-shadow: 0 4px 12px rgba(61, 90, 61, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .neta-display {
+            min-height: 360px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .neta-title {
+            font-size: 22px;
+            color: #2d4a2d;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .neta-intro {
+            font-size: 15px;
+            color: #5a7a5a;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: #f5faf5;
+            border-left: 4px solid #a8d4a8;
+            border-radius: 8px;
+        }
+
+        .neta-section {
+            margin-bottom: 18px;
+        }
+
+        .neta-section-title {
+            font-size: 13px;
+            color: #7ab87a;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .neta-points {
+            font-size: 14px;
+            color: #4a6a4a;
+            line-height: 1.8;
+        }
+
+        .neta-points li {
+            margin-left: 20px;
+            margin-bottom: 6px;
+        }
+
+        .neta-question {
+            font-size: 15px;
+            color: #5a7a5a;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid #e0e8e0;
+            font-style: italic;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 28px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+            box-shadow: 0 2px 6px rgba(61, 90, 61, 0.12);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #7ab87a 0%, #6ba86b 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(122, 184, 122, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #5a7a5a;
+            border: 2px solid #c8dcc8;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fef9;
+            border-color: #a8d4a8;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            color: #6b8a6b;
+        }
+
+        .scroll-hint {
+            text-align: center;
+            font-size: 12px;
+            color: #a8c8a8;
+            margin-top: 16px;
+        }
+
+        .counter {
+            text-align: center;
+            font-size: 12px;
+            color: #8a9a8a;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .content-area {
+                padding: 24px 16px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .theme-btn {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+
+            .neta-title {
+                font-size: 18px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="leaf-icon">🌿</div>
+            <h1>noteネタ帳</h1>
+            <p class="subtitle">毎日のネタを、さっと見つける</p>
+        </header>
+
+        <div class="theme-selector">
+            <button class="theme-btn active" data-theme="all">すべて</button>
+            <button class="theme-btn" data-theme="0">AI・自動化</button>
+            <button class="theme-btn" data-theme="1">ガジェット</button>
+            <button class="theme-btn" data-theme="2">起業・副業</button>
+        </div>
+
+        <div class="content-area">
+            <div id="netaContainer" class="neta-display">
+                <div class="empty-state">
+                    <div class="empty-icon">✨</div>
+                    <p class="empty-text">テーマを選んで、ネタを見つけましょう</p>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" id="randomBtn">ランダムで見る</button>
+                <button class="btn btn-secondary" id="nextBtn">次のネタ</button>
+            </div>
+
+            <div class="counter" id="counter"></div>
+            <div class="scroll-hint" id="scrollHint"></div>
+        </div>
+    </div>
+
+    <script>
+        const data = {
+            0: [
+                {
+                    title: "ChatGPTで「正しく質問する」技術",
+                    intro: "同じAIなのに、ある人の質問には素晴らしい答えが返ってくるのに、別の人には微妙—その差は、実は質問の「設定」にありました。",
+                    points: "1. プロンプトの基本構造（背景情報・役割指定・出力形式の3要素）\n2. 悪い質問と良い質問の具体例比較\n3. 反復改善のループ（AIの回答をもとに質問を洗練させる方法）",
+                    question: "あなたがAIに質問するときに、工夫していることはありますか？"
+                },
+                {
+                    title: "ローカルLLMは「自分専用AI」への第一歩",
+                    intro: "クラウドのAIも便利ですが、自分の PC に AIを入れて走らせると、プライバシーも速度も、自由度もまったく違う世界が広がります。",
+                    points: "1. ローカルLLMのメリット（データ漏洩リスク、応答速度、カスタマイズ性）\n2. 初心者でもはじめやすい環境構築（Ollama、Open WebUI など）\n3. クラウド版との使い分け（何をローカル、何をクラウドでやるか）",
+                    question: "AIを「使う」から「育てる」へ—そういう選択肢があること、知ってましたか？"
+                },
+                {
+                    title: "日本語音声認識が仕事を変える",
+                    intro: "「話すだけで記録、議事録、メモが自動で整理される」—それがもう、特別な技術ではなく、手軽に実現できるようになりました。",
+                    points: "1. Whisper など高精度な音声認識ツールの進化\n2. 実務への応用例（会議の自動議事録化、オンライン講座の字幕生成）\n3. 精度を高めるコツ（マイク選び、背景ノイズの処理）",
+                    question: "もし会議中に「議事録作成」の負担がなくなったら、何に時間を使いたいですか？"
+                },
+                {
+                    title: "業務マニュアルを AIに「読ませる」ことで起きた変化",
+                    intro: "複雑なマニュアルを AI に学習させると、スタッフの質問に対し、瞬時に正確な回答を返してくれるようになります。",
+                    points: "1. ドキュメント学習の仕組み（RAG・ベクトルDB の基礎）\n2. 導入時の準備（マニュアルの整理、ルール明文化）\n3. 実際の効果と限界（効率化と人間の判断のバランス）",
+                    question: "あなたの職場に「いつも同じ質問が来る相談内容」ってありませんか？"
+                },
+                {
+                    title: "Excelの「繰り返し作業」をスクリプト化した話",
+                    intro: "毎日 30 分かけていた単調な入力・整理業務が、ある朝突然「たった 5 秒」で終わるようになった—その仕組みと、誰でもできる第一歩を。",
+                    points: "1. よくある繰り返し業務の見つけ方と分析法\n2. 初心者向けの自動化ツール（マクロ、VBA、Python 連携）\n3. 自動化後の「浮いた時間」の使い方・心構え",
+                    question: "最近、「同じことを何度も繰り返してるな」と感じた業務はありますか？"
+                },
+                {
+                    title: "AI ライティングツールの「使い方」で結果は 180 度変わる",
+                    intro: "AIに文章を書かせると「つまらない」と感じる人と、「自分より上手い」と感じる人の差は、実は「編集者マインド」の有無だったりします。",
+                    points: "1. AIが得意な執筆（ニュートラル・データ・説明文）と苦手な執筆（感情・個性・創意）\n2. 出力物を「改稿の素材」として見る視点\n3. 効率と個性のバランス（生産性と表現の両立）",
+                    question: "あなたが「この文章、いいな」と感じるのは、どんなポイントですか？"
+                },
+                {
+                    title: "スクリーンショット OCR で「文字入力」が消える日",
+                    intro: "看板の写真を撮る、資料をスクショする—それだけで、中の文字がテキストに変わって、すぐ編集・検索できるようになりました。",
+                    points: "1. OCR 技術の進化（精度、多言語対応）\n2. 実務活用例（紙の資料のデジタル化、領収書管理）\n3. スマートフォンアプリの選び方と精度を高めるコツ",
+                    question: "「手で入力する」という作業が本当に必要なのか、一度考えてみませんか？"
+                },
+                {
+                    title: "Slack ボット で「報告・集計・通知」が自動になった",
+                    intro: "毎日の定型報告、期限管理、データ集計—これらが「メッセージを送るだけ」で自動に回るようになると、チーム全体の時間密度が変わります。",
+                    points: "1. ボット作成の基礎（簡単な自動化から本格的なワークフローまで）\n2. よくある自動化パターン（ステータス報告、タスク集計、リマインダー）\n3. 導入時の心構え（段階的な拡張、チームとの歩調合わせ）",
+                    question: "もし毎日の「報告作業」が自動になったら、何が変わると思いますか？"
+                },
+                {
+                    title: "「使い捨てメール」で個人情報を守りながらサービス利用",
+                    intro: "登録のたびに本名・メールアドレスを晒すのはもう古い。一時的なメールアドレスを使い分ければ、プライバシーと利便性の両立ができます。",
+                    points: "1. 一時メールサービスの仕組みと種類\n2. 個人情報保護の重要性（スパムメール、個人情報流出の現実）\n3. 実践的な使い分け戦略（信頼できるサービスと使い捨てメールの線引き）",
+                    question: "あなたのメールボックス、本当に必要な情報と迷惑メールの比率はどのくらいですか？"
+                },
+                {
+                    title: "データ分析は「プログラマー特有の技術」ではなくなった",
+                    intro: "複雑な SQL も、統計の知識もいらない。いまなら、AI に「このデータ、何が見える？」と聞くだけで、隠れた傾向が見えてきます。",
+                    points: "1. ノーコードデータ分析ツールの種類と特徴\n2. AI を使った簡単な分析（質問→可視化→解釈）\n3. 「データドリブンな判断」の実例（小規模ビジネスでの活用例）",
+                    question: "あなたは普段、どんな判断を「勘」で決めていて、データで確認したいと思いますか？"
+                },
+                {
+                    title: "音声クローニングで「自分の声」を AI 化する",
+                    intro: "短い音声サンプルから、自分そっくりな声の AI を作ることができます。これが、仕事や創作の可能性をどう広げるのか。",
+                    points: "1. 音声クローニング技術の現状と実装方法\n2. 倫理的な課題（同意、なりすまし対策）\n3. クリエイティブな活用例（ポッドキャスト、学習コンテンツ、朗読配信）",
+                    question: "自分の声が「コンテンツになる」としたら、何を作ってみたいですか？"
+                },
+                {
+                    title: "Notion を「第二の脳」にするまでのプロセス",
+                    intro: "情報が脳に散らばったままでは、せっかくのアイデアも埋もれてしまう。整理の「型」を持つと、思考がぐっと軽くなります。",
+                    points: "1. 情報の「受け取り→整理→活用」の流れ設計\n2. 実用的なデータベース構造の作り方\n3. スマートフォンとの連携、日々の習慣化",
+                    question: "今、あなたが「どこかに書いておこう」と思ったら、それはどこに行きますか？"
+                },
+                {
+                    title: "AI ペアプログラミングで、コード品質が上がった理由",
+                    intro: "プログラムを書く時に AI に相談すると、バグが減り、設計がよくなり、何より「考える時間」が増えます。",
+                    points: "1. AI コーディングツールの活用法（ChatGPT、GitHub Copilot、Claude）\n2. 人間の「判断と創意」の役割が逆に高まること\n3. 学習の効率化（新しい言語・フレームワークの習得）",
+                    question: "あなたが「難しいコードを読む」ときに、AI に「これ、何してるコード？」と聞けたら？"
+                },
+                {
+                    title: "家計管理ツールを「AI アシスタント」化する",
+                    intro: "レシートをスマホで撮るだけで自動分類される。その先、AI が支出パターンを分析し、「ここ、減らせますよ」と教えてくれる—その現実。",
+                    points: "1. スマート家計管理ツールの機能比較\n2. 自動化による「無意識支出」の可視化\n3. データから行動を変える工夫（習慣化の仕組み）",
+                    question: "自分の「お金の流れ」を、正確に把握してますか？"
+                },
+                {
+                    title: "業務日報を「AI 要約」して時間を取り戻す",
+                    intro: "毎日の日報作成に 30 分費やしていた同僚が、ある朝「10 分で終わった」と言った。その秘訣は、シンプルな「AI 要約テンプレート」でした。",
+                    points: "1. 実務向けの要約 AI プロンプトの作り方\n2. テンプレート化で再利用性を高める方法\n3. 形式的な報告から「情報共有」への意識転換",
+                    question: "あなたは毎日、「本当は必要ない」と思いながら書いている書類ってありますか？"
+                },
+                {
+                    title: "「AI が仕事を奪う」ではなく「AI と働く」への転換",
+                    intro: "AI に仕事を奪われるのではなく、AI を使える人材に進化する—その心構えと、今から始められる3つのステップ。",
+                    points: "1. AI リテラシーの3段階（使える→選べる→組み合わせられる）\n2. 現在の職業スキルを AI 時代仕様にアップデートする視点\n3. 「人間にしかできない仕事」の再定義",
+                    question: "あなたの仕事の中で「AI には絶対に任せたくない部分」って何ですか？"
+                }
+            ],
+            1: [
+                {
+                    title: "MacBook Air M4 が「開発機」として完成度高い理由",
+                    intro: "高いから躊躇していたあなたへ—M4 チップ、充分なメモリ、長時間バッテリー。開発環境としてのコスパを計算し直してみてください。",
+                    points: "1. M4 チップの実性能（プログラミング、エンコーディング、データ処理での体感速度）\n2. 開発環境構築の容易さ（Homebrew、Docker、言語環境のセットアップ）\n3. Windows PC との選別ポイント（費用対効果、長期保有のコスト）",
+                    question: "あなたが「今このマシンで何がストレスですか？」を言語化したとき、それは本当にマシンのせいですか？"
+                },
+                {
+                    title: "パスワード管理アプリなしに、もはや生活は成り立たない",
+                    intro: "「全部同じパスワード」「付箋に書いてある」—そういう人たちを見ると心配になります。1000 円の安心は、最高の投資です。",
+                    points: "1. パスワード管理アプリの必須機能（暗号化、自動入力、侵害通知）\n2. 主流ツール比較（1Password、Bitwarden、LastPass など）\n3. 家族・チームでの共有方法と運用ルール",
+                    question: "もし今、あなたのメールアドレスとパスワードがどこかで漏洩していたら、どうしますか？"
+                },
+                {
+                    title: "外付け SSD 故障から学んだ「データ管理の本当の話」",
+                    intro: "大切なデータが入った外付け SSD が突然認識しなくなった—その時に初めて気づく「バックアップの重要性」は、後の祭りです。",
+                    points: "1. ストレージ故障の兆候と予防法（S.M.A.R.T. データの読み方）\n2. 3-2-1 バックアップ戦略（3 コピー、2 種類のメディア、1 つはオフサイト）\n3. NAS（ネットワークストレージ）の選び方と活用法",
+                    question: "あなたは、本当に失ったら困るデータが、いくつバックアップされていますか？"
+                },
+                {
+                    title: "VPN を「セキュリティ対策」から「プライバシー保護」で考える",
+                    intro: "カフェの無線 LAN の危険性は知ってるけど、VPN を使うのは面倒—その「面倒」が、実は危険への一番の近道です。",
+                    points: "1. VPN の仕組み（通信内容の暗号化、IP マスキング）\n2. 無線 LAN 利用時の実際のリスク（通信盗聴、中間者攻撃）\n3. 信頼できる VPN サービスの選び方と運用コスト",
+                    question: "あなたが最後に、公開 WiFi でメールをチェックしたのは、いつですか？"
+                },
+                {
+                    title: "スマートフォンを「監視される端末」から「自分の道具」に取り戻す",
+                    intro: "アプリの権限、トラッキング、データ収集—スマートフォンがどれだけあなたを「観察」しているか、一度きちんと見つめてみました。",
+                    points: "1. スマートフォンの権限管理（位置情報、カメラ、連絡先アクセス）\n2. トラッキング広告への対策（AdID リセット、プライバシーレポート）\n3. プライバシー重視の OS・アプリ選択（GrapheneOS など）",
+                    question: "あなたのスマートフォンの設定を、この 1 年間で一度も変更していないとしたら、それはなぜですか？"
+                },
+                {
+                    title: "クラウドストレージの「安価プラン」でいい人 vs 必要な人",
+                    intro: "Google One の 100GB も、Microsoft 365 の OneDrive 1TB も、本当にあなたに必要ですか？—あるいは、必要なのに使えていません？",
+                    points: "1. 主流サービスの容量・価格・同期仕様の比較\n2. 「クラウド保存の癖」をつけるまでのプロセス\n3. セキュリティと利便性のバランス（共有機能の選び方）",
+                    question: "あなたが「今この瞬間に」スマートフォンを失くしたら、どのデータが心配ですか？"
+                },
+                {
+                    title: "複数デバイス時代の「シングルサインオン」活用法",
+                    intro: "iPhone、Android、iPad、Mac、Windows—デバイスが増えるほど、パスワード管理は複雑になる。同時に、シングルサインオン(SSO) は必須スキルに。",
+                    points: "1. SSO の仕組み（OAuth、OpenID Connect の基礎）\n2. 信頼できるプロバイダー選び（Apple、Google、Microsoft）\n3. 職場・個人でのセキュアな運用ルール",
+                    question: "毎回ログインするたびに「パスワード入力」に時間をかけていることに、気づいてますか？"
+                },
+                {
+                    title: "ガジェットは「新しさ」より「手放せなくなる瞬間」で選ぶ",
+                    intro: "最新モデルが必ずしも「自分の生活を変える」わけじゃない。むしろ「地味だけど毎日使う」ものが、本当の投資です。",
+                    points: "1. ガジェット選びの思考法（スペック表と実生活のギャップ）\n2. 実際の使用シーン を想像する重要性\n3. 「後悔しないガジェット」と「失敗ガジェット」の分かれ目",
+                    question: "あなたが「毎日のように使ってるガジェット」と「買ったけど使わないもの」は、何ですか？"
+                },
+                {
+                    title: "家計簿アプリで「無意識の浪費」が見える化する",
+                    intro: "「月に何に使ってるか不明」という人ほど、家計簿アプリを入れるだけで、お金の流れがはっきり見えて、支出が減ります。",
+                    points: "1. 家計簿アプリの選び方（銀行連携、分析機能、UI/UX）\n2. 「レシート撮影→自動分類」の仕組みと精度\n3. データから行動を変えるまでのステップ",
+                    question: "あなたが「つい買ってしまう」カテゴリーって、何ですか？"
+                },
+                {
+                    title: "USB ハブ一つで「デスク環境」の快適さが劇的に変わる",
+                    intro: "ケーブルをいちいち抜き差しするストレスは、ハブ一つで消えます。その程度のことですが、毎日のイライラが確実に減ります。",
+                    points: "1. ハブの種類と選び方（USB-C、Thunderbolt、給電能力）\n2. 「本当に使う接続」を見極めるコツ\n3. デスク環境の整理による生産性向上",
+                    question: "あなたのデスクに今、何本のケーブルが刺さってますか？"
+                },
+                {
+                    title: "2 段階認証は「面倒」ではなく「保険」です",
+                    intro: "パスワードが漏洩しても、スマートフォンまで盗まれない限り、アカウントは守られる。その「最後の砦」の設定、まだやってませんか？",
+                    points: "1. 2FA の種類（SMS、認証アプリ、セキュリティキー）\n2. 各方式のメリット・デメリット（セキュリティレベルと利便性）\n3. 「バックアップコード」の保管方法",
+                    question: "もし今、あなたのメールアカウントにログインできる人がいたら、何ができると思いますか？"
+                },
+                {
+                    title: "ワイヤレスイヤホンの「音質」より「つけ心地」で失敗する理由",
+                    intro: "スペック表では分からない「耳への負担」「フィット感」「長時間使用時の快適さ」—それこそが、選別の本当の基準です。",
+                    points: "1. イヤホン選びの「実際のテストポイント」（試聴の重要性）\n2. 装着感と音質のトレードオフ\n3. 個人差が大きい理由（耳の形、使用シーンの違い）",
+                    question: "あなたが「毎日つけてるイヤホン」は、本当に気に入ってますか、それとも「買ったから使ってる」ですか？"
+                },
+                {
+                    title: "資産管理シートで「自分のお金」を可視化する",
+                    intro: "銀行残高、クレジットカード、証券、ポイント—バラバラに散らばった資産を一箇所で管理すると、人生設計が変わります。",
+                    points: "1. スプレッドシート or アプリで一元管理する方法\n2. 定期更新の習慣化（週 1 回 vs 月 1 回の効果の差）\n3. 目標設定との連動（資産目標と行動計画）",
+                    question: "「今、自分の純資産がいくらか」正確に答えられますか？"
+                },
+                {
+                    title: "スマートウォッチは「時間を見る道具」ではなく「健康データの窓」",
+                    intro: "毎日の心拍数、睡眠、歩数—その小さな数字の積み重ねが、あなたの「今」を驚くほど正確に教えてくれます。",
+                    points: "1. スマートウォッチのヘルスデータの信頼性と活用法\n2. 継続記録による「自分の基準値」の発見\n3. データから行動を変える（睡眠改善、運動習慣など）",
+                    question: "あなたは「最近、よく寝た気がする」と「実際のデータ」で、どれだけズレがあると思いますか？"
+                },
+                {
+                    title: "無料 WiFi 接続時に「使っていい機能」「使っちゃダメな機能」",
+                    intro: "公開 WiFi でメールチェックはいい。でも銀行ログイン・クレジットカード入力は絶対NG—その線引きを、もう一度明確にしておきます。",
+                    points: "1. 無線 LAN 利用時の実際のリスク（具体的な被害例）\n2. 「危ない操作」「大丈夫な操作」の判定基準\n3. VPN がない時の代替案（テザリング、有料 WiFi の選別）",
+                    question: "あなたがカフェで最初にやることって、何ですか？—WiFi 接続？それとも何か？"
+                },
+                {
+                    title: "「ガジェット沼」から抜け出すための、シンプルな質問",
+                    intro: "ついつい新しい製品が気になって、買ってしまう—そのループを止めるために、たった一つの問いを習慣づけてみました。",
+                    points: "1. 「それは本当に必要か」を判定する 5 つの質問\n2. 欲しいもの → 本当に必要なもの、への思考転換\n3. 消費と投資の区別（ガジェットが「投資になる」条件）",
+                    question: "あなたが「これさえあれば」と買ったガジェット、今も使ってますか？"
+                }
+            ],
+            2: [
+                {
+                    title: "「会社員スキル」と「起業スキル」は別物です",
+                    intro: "仕事ができる会社員が、そのまま起業して成功するわけではない—その理由を、率直に考えてみました。",
+                    points: "1. 会社員時代に「見えなかった部分」（営業、経理、マーケティング）\n2. 「会社の看板なしで信頼を作る」ことの難しさ\n3. 起業前に磨くべき「主体的な判断力」と「試行錯誤の習慣」",
+                    question: "あなたが今の会社を辞めたら、「あ、これって会社がやってくれてたんだ」と気づくことって、何だと思いますか？"
+                },
+                {
+                    title: "最初の顧客「一人」をつかむまでが、最も長い",
+                    intro: "マーケティング戦略も事業計画も、顧客ゼロではただの想像です。最初の一人に出会うまでの、地道な道のりが本当の起点です。",
+                    points: "1. 初期顧客の見つけ方（既存ネットワーク活用、SNS発信）\n2. 「欲しい人」と「買ってくれる人」のズレを埋める工夫\n3. 最初の顧客からの学び（完璧なサービスより試行錯誤）",
+                    question: "もし明日「個人で何かを売る」とするなら、誰に声をかけますか？"
+                },
+                {
+                    title: "ひとりビジネスだからこそ「システム化」が命",
+                    intro: "人を雇わない分、自分の時間を効率化できなければ、成長の壁は絶対に来ます。その壁を越える仕組みづくり。",
+                    points: "1. 「毎回同じことをやってる」業務の洗い出し\n2. 自動化・外注化・テンプレート化の優先順位\n3. 時間単価を意識した判断基準（何を自分がやるべきか）",
+                    question: "あなたの業務の中で「これを自動化したら時間が何倍も増える」ってものは？"
+                },
+                {
+                    title: "キャッシュフロー管理は、起業後「最も重要な経営指標」",
+                    intro: "利益が出ていても、現金がなければ事業は続かない。その恐ろしい現実を、数字で見える化する方法。",
+                    points: "1. 利益 vs キャッシュフローの違い（売上計上と入金のタイムラグ）\n2. 簡単なキャッシュフロー表の作り方\n3. 資金ショートを防ぐための「前払い」「回収」の工夫",
+                    question: "「来月の現金、足りるかな」って不安を感じたことはありますか？"
+                },
+                {
+                    title: "note・ブログは「営業資料」兼「信頼構築」ツール",
+                    intro: "営業トークで「自分ってこんな人です」と説明するより、半年分の記事で「あ、この人すごい」と思わせる方が強い。",
+                    points: "1. 発信による「パーソナルブランド」の構築プロセス\n2. 読者から顧客への自然な流れ（押し売りではなく信頼獲得）\n3. 継続発信のハードル（最初の 30 記事まで）",
+                    question: "あなたは「この人の話を聞きたい」と思わせる工夫を、していますか？"
+                },
+                {
+                    title: "「単価」を上げることが、最も効率的な成長戦略",
+                    intro: "顧客を 2 倍に増やすより、単価を 2 倍にする方が遥かに簡単です。その思考転換が、ひとりビジネスの成否を分けます。",
+                    points: "1. 低単価ビジネスの落とし穴（時間売上性、疲弊）\n2. 単価を上げるための「価値の再定義」\n3. 顧客選別による「望ましい顧客だけ」の確保",
+                    question: "あなたが「この単価では採算が取れない」と感じたことはありますか？"
+                },
+                {
+                    title: "確定申告前に「税理士相談」は、投資です",
+                    intro: "「自分で何とかしよう」と思って税務署に駆け込むと、後付けの修正申告で余計な税金を払うことに。プロに早めに相談した方が安い。",
+                    points: "1. 個人事業主が「最低限やるべき」経理（記帳、領収書管理）\n2. 税理士の選び方（個人事業主向け、業種知識）\n3. 事前相談による「節税対策」の実例",
+                    question: "あなたは「税金の計算」に、どれだけ時間を使ってますか？"
+                },
+                {
+                    title: "「得意なこと」ではなく「困っている人の課題」から始める",
+                    intro: "自分が得意なことを商売にしたい—その気持ちは分かりますが、実は「誰かの困り事」が最初の商材です。",
+                    points: "1. 自分の価値と市場ニーズのズレを見つける方法\n2.「好きなこと」と「売れることの」の両立戦略\n3. ニーズ発掘のための「聞き方」と「観察力」",
+                    question: "あなたの周りで「実は困ってる」けど、誰も解決してくれていないことって、ありますか？"
+                },
+                {
+                    title: "最初の「仕事の断り方」が、ビジネスの質を決める",
+                    intro: "起業初期は「とにかく仕事をください」という心理が働きます。でもそこで妥協すると、その後ずっと低単価・低利益の泥沼です。",
+                    points: "1. 「本当にやりたい仕事」の基準を持つことの重要性\n2. 良い顧客・悪い顧客の見分け方（信頼、単価、継続性）\n3. 丁寧な断り方（関係を損なわない）",
+                    question: "あなたが「この仕事、やりたくないな」と感じた時、どうしていますか？"
+                },
+                {
+                    title: "「副業起業」と「本業起業」は別の判断が必要",
+                    intro: "安定を求めて副業から始めるのは正解か？それとも、一択に絞る方が早いのか—状況による正しい選択。",
+                    points: "1. 副業から本業への移行 タイミング（売上ベース、時間ベース）\n2. 両立時のメンタルと体力管理（実は想像以上に疲れる）\n3. 「本気度」の問題—副業は「いつでも辞められる」という甘さ",
+                    question: "もし「副業がうまくいったら」という条件なら、本気で本業に乗り換える覚悟はありますか？"
+                },
+                {
+                    title: "契約書は「揉めるから必要」ではなく「揉めない」ために必要",
+                    intro: "「親しい顧客だから口約束でいい」—その甘さが、一番大切な関係を壊します。契約書は「信頼」の証です。",
+                    points: "1. ひとりビジネスに最低限必要な契約要素（納期、単価、変更対応）\n2. テンプレート化による効率化\n3. 「面倒くさい顧客」との関係調整",
+                    question: "あなたは「実は請求内容で揉めたことが」ないですか？"
+                },
+                {
+                    title: "SNS 発信は「バズ」より「フォロワーの満足」を目指す",
+                    intro: "一時的なバズより、毎回「この発信、参考になる」と思ってくれるコアなファンを 100 人作る方が、ビジネスになります。",
+                    points: "1. 「エンゲージメント」指標の重要性（フォロー数より反応度）\n2. 継続発信による「ファン化」のプロセス\n3. SNS 発信がビジネスに繋がる条件",
+                    question: "あなたをフォローしている人たちは、「あなたの投稿を見たくて」フォローしてますか？"
+                },
+                {
+                    title: "「コミュニティ」を作ることで、ビジネスはスケールする",
+                    intro: "一対一の関係だけでは限界がある。同じ興味を持つ人たちのコミュニティを作ると、情報流通と信頼が指数関数的に広がります。",
+                    points: "1. コミュニティ運営の基本（目的、ルール、活性化）\n2. オンラインコミュニティのプラットフォーム選び\n3. コミュニティがビジネスに繋がる仕組み（顧客化、紹介生成）",
+                    question: "あなたは「こういう人たちと繋がりたい」という共通項を持つ人を、何人知っていますか？"
+                },
+                {
+                    title: "「個人のブランド」と「サービスの質」は別問題",
+                    intro: "SNS で人気でも、仕事ができない人は山ほどいる。逆も然り。本当に大事なのは、サービスの「再現性」と「質」です。",
+                    points: "1. ブランド力に頼ることの危険性（移ろいやすい）\n2. 「顧客満足度」を最優先する経営姿勢\n3. 口コミと信頼の循環を作る工夫",
+                    question: "あなたが「この人に頼みたい」と思う理由は、SNS での見た目ですか？それとも実績ですか？"
+                },
+                {
+                    title: "ひとりビジネスこそ「定期的な見直し」が必須",
+                    intro: "事業計画を立てたらそれで終わり—ではなく、3ヶ月ごとの「振り返り→改善」が、ビジネスの進化速度を決めます。",
+                    points: "1. 簡単な KPI 設定（売上、顧客数、時間効率）\n2. 「うまくいっていないこと」の根本原因を見つける思考法\n3. 小さな改善の積み重ねが大きな変化を生む",
+                    question: "あなたは「最近の 3 ヶ月間」で、何か大きく変えたことはありますか？"
+                },
+                {
+                    title: "「プロとしての責任感」が、ひとりビジネスの最大資産",
+                    intro: "小さなビジネスだからこそ、相手の期待を超えること。その積み重ねが「あの人なら大丈夫」という信頼を作ります。",
+                    points: "1. 「顧客の期待値設定」の重要性（約束できることしか約束しない）\n2. トラブル対応における「誠実さ」の価値\n3. 長期的な信頼構築による「仕事の質」の向上",
+                    question: "あなたが「この人に頼みたい」と何度も思う理由は、何ですか？"
+                }
+            ]
+        };
+
+        let currentTheme = 'all';
+        let currentIndex = 0;
+        let currentNeta = null;
+
+        const themeButtons = document.querySelectorAll('.theme-btn');
+        const netaContainer = document.getElementById('netaContainer');
+        const randomBtn = document.getElementById('randomBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const counter = document.getElementById('counter');
+
+        function getFilteredData() {
+            if (currentTheme === 'all') {
+                return [...data[0], ...data[1], ...data[2]];
+            } else {
+                return data[parseInt(currentTheme)];
+            }
+        }
+
+        function renderNeta(neta) {
+            if (!neta) {
+                netaContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">✨</div>
+                        <p class="empty-text">テーマを選んで、ネタを見つけましょう</p>
+                    </div>
+                `;
+                counter.textContent = '';
+                return;
+            }
+
+            const filteredData = getFilteredData();
+            const idx = filteredData.indexOf(neta);
+            const totalCount = filteredData.length;
+
+            netaContainer.innerHTML = `
+                <div>
+                    <h2 class="neta-title">${neta.title}</h2>
+                    <div class="neta-intro">${neta.intro}</div>
+                    <div class="neta-section">
+                        <div class="neta-section-title">書くべきポイント</div>
+                        <ul class="neta-points">
+                            ${neta.points.split('\n').map(point => `<li>${point}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div class="neta-question">✏️ ${neta.question}</div>
+                </div>
+            `;
+
+            counter.textContent = `${idx + 1} / ${totalCount}`;
+        }
+
+        function showRandomNeta() {
+            const filteredData = getFilteredData();
+            if (filteredData.length === 0) return;
+            currentNeta = filteredData[Math.floor(Math.random() * filteredData.length)];
+            currentIndex = 0;
+            renderNeta(currentNeta);
+            netaContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function showNextNeta() {
+            const filteredData = getFilteredData();
+            if (filteredData.length === 0) return;
+            currentIndex = (currentIndex + 1) % filteredData.length;
+            currentNeta = filteredData[currentIndex];
+            renderNeta(currentNeta);
+            netaContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        themeButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                themeButtons.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentTheme = this.dataset.theme;
+                currentIndex = 0;
+                currentNeta = null;
+                renderNeta(null);
+                counter.textContent = '';
+            });
+        });
+
+        randomBtn.addEventListener('click', showRandomNeta);
+        nextBtn.addEventListener('click', showNextNeta);
+    </script>
+</body>
+</html>
